@@ -29,12 +29,12 @@ if [[ $SLURM_JOB_NODELIST ]] ; then
 fi
 
 
-module use /nfs/turbo/umms-dinov/Projects/socr/modulefiles/
+module use # add directory name
 module load socr-R-libs/1.5
 module load R
 #module load gcc python/3.9.12
 #module load gcc cuda/11.7.1 cudnn/11.7-v8.7.0
-#source /nfs/turbo/umms-dinov/LLaMA/1.0.1/bin/activate
+#source /nfs/turbo/XXXXXX/LLaMA/1.0.1/bin/activate
 ## move LlaMA here for faster loading: /ime/dinov_root/dinov0
 
 ## launch this sbat file on the ssh terminal on Lighhouse with: sbatch filename.sbat (this file)
@@ -44,7 +44,7 @@ module load R
 levels_to_test = ["small","medium","large","indep"]
 #R CMD BATCH --args $workspace_directory $file_to_query[i] < /ifshome/smarino/scripts/test_passing_parameters_in_SLURM.R
 ## need to add a loop here !!
-R CMD BATCH --args $levels_to_test[i] < /ifshome/smarino/scripts/test_passing_parameters_in_SLURM.R
+R CMD BATCH --args $levels_to_test[i] < /ifshome/XXXXX/scripts/test_passing_parameters_in_SLURM.R
 
 datasifter_profiling.R # this is the one with the loop inside the R script
 datasifter_profiling_noloop.R # this is the one without the loop inside the R script
