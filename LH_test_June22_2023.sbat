@@ -1,0 +1,63 @@
+#!/bin/bash
+                                       ## REQUIRED: #!/bin/bash must be on the 1st line
+                                       ## and it must be the only string on the line
+#SBATCH --job-name=datasifter_profiling            ## Name of the job for the scheduler
+#SBATCH --account=dinov                ## name of the resource account: Use test on GLB
+                                       ## generally your PI's uniqname will go here
+#SBATCH --partition=dinov           ## name of the queue to submit the job to.
+                                       ## (Choose from: standard, debug, largemem, gpu)
+##SBATCH --gpus=1                  ## if partition=gpu, number of GPUS needed
+##SBATCH -N 4                                       ## make the directive = #SBATCH, not ##SBATCH
+#SBATCH --nodes=1                      ## number of nodes you are requesting
+#SBATCH --ntasks=1          ## how many cores do you want to reserve
+#SBATCH --cpus-per-task=1
+
+
+#SBATCH --time=0:40:00                 ## Maximum length of time you are reserving the
+                                       ## resources for
+#SBATCH --mem-per-cpu=40g                                        ## (if job ends sooner, bill is based on time used)
+#SBATCH --mail-user=vbassi@umich.edu  ## send email notifications to umich email listed
+#SBATCH --mail-type=END                ## when to send email (standard values are:
+                                       ## NONE, BEGIN, END, FAIL, REQUEUE, ALL.
+                                       ## (See documentation for others)
+#SBATCH --output=./%x-%j               ## send output and error info to the file listed
+                                       ##(optional: different name format than default)
+# I recommend using the following lines to write output to indicate your script is working
+if [[ $SLURM_JOB_NODELIST ]] ; then
+   echo "Running on"
+   scontrol show hostnames $SLURM_JOB_NODELIST
+fi
+
+
+module use /nfs/turbo/umms-dinov/Projects/socr/modulefiles/
+module load socr-R-libs/1.5
+module load R
+#module load gcc python/3.9.12
+#module load gcc cuda/11.7.1 cudnn/11.7-v8.7.0
+#source /nfs/turbo/umms-dinov/LLaMA/1.0.1/bin/activate
+## move LlaMA here for faster loading: /ime/dinov_root/dinov0
+
+## launch this sbat file on the ssh terminal on Lighhouse with: sbatch filename.sbat (this file)
+## Run the datasifter profiling R script (line bel)
+## this could be a loop, with levels = c("small","medium","large","indep")
+
+levels_to_test = ["small","medium","large","indep"]
+#R CMD BATCH --args $workspace_directory $file_to_query[i] < /ifshome/smarino/scripts/test_passing_parameters_in_SLURM.R
+## need to add a loop here !!
+R CMD BATCH --args $levels_to_test[i] < /ifshome/smarino/scripts/test_passing_parameters_in_SLURM.R
+
+datasifter_profiling.R # this is the one with the loop inside the R script
+datasifter_profiling_noloop.R # this is the one without the loop inside the R script
+
+#  Put your job commands after this line
+#echo "hello world"
+#python reshard.py 1 modeltoken/65B/ reshard_model/65_1
+
+
+#torchrun --nproc_per_node 1 example.py --ckpt_dir modeltoken/7B --tokenizer_path modeltoken/tokenizer.model
+
+#torchrun --nproc_per_node 2 example.py --ckpt_dir modeltoken/13B --tokenizer_path modeltoken/tokenizer.model
+
+#torchrun --nproc_per_node 4 example.py --ckpt_dir modeltoken/30B --tokenizer_path modeltoken/tokenizer.model
+
+#torchrun --nproc_per_node 8 example.py --ckpt_dir modeltoken/65B --tokenizer_path modeltoken/tokenizer.model
